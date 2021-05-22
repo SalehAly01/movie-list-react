@@ -53,7 +53,6 @@ export const moviesSlice = createSlice({
         return { ...state, status: "loading" };
       })
       .addCase(getMoviesAsyncAction.fulfilled, (state, action) => {
-        // eslint-disable-next-line camelcase
         const { results, page, total_pages, total_results } = action.payload;
 
         return {
