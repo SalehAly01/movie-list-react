@@ -90,9 +90,7 @@ export const AddMovieModal = ({
               variant="standard"
               className={classes.field}
               value={title}
-              onChange={(
-                event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-              ) => setTitle(event.target.value)}
+              onChange={(event) => setTitle(event.target.value)}
             />
 
             <TextField
@@ -102,9 +100,7 @@ export const AddMovieModal = ({
               variant="standard"
               className={classes.field}
               value={overview}
-              onChange={(
-                event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-              ) => setOverview(event.target.value)}
+              onChange={(event) => setOverview(event.target.value)}
             />
 
             <TextField
@@ -116,14 +112,12 @@ export const AddMovieModal = ({
               className={classes.field}
               InputLabelProps={{ shrink: true }}
               value={releaseDate}
-              onChange={(
-                event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-              ) => setReleaseDate(event.target.value)}
+              onChange={(event) => setReleaseDate(event.target.value)}
             />
 
             <input
               type="file"
-              onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+              onChange={async (event) => {
                 const file = event.target.files[0];
                 const url = await readURL(file);
                 setPoster(url as string);
