@@ -19,9 +19,10 @@ const useStyles = makeStyles(() => ({
     padding: "0 30px",
   },
   title: {
-    marginRight: 30,
     textDecoration: "none",
     color: "#fff",
+    minWidth: 160,
+    display: "block",
   },
   toolBar: { flex: 1, display: "flex", justifyContent: "space-between" },
   tabs: { height: 54, marginTop: 10 },
@@ -55,7 +56,11 @@ export const AppHeader: React.FC = () => {
           />
         </Tabs>
 
-        <Button variant="contained" onClick={() => setModalOpen(true)}>
+        <Button
+          variant="contained"
+          style={{ minWidth: 110, marginLeft: 10 }}
+          onClick={() => setModalOpen(true)}
+        >
           Add Movie
         </Button>
       </Toolbar>
