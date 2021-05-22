@@ -1,44 +1,51 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   AppBar,
+  Button,
   makeStyles,
   Tab,
   Tabs,
   Toolbar,
   Typography,
 } from "@material-ui/core";
+import { AddMovieModalContext } from "helpers/add-movie-modal-context";
 
-const useStyles = makeStyles((theme) => ({
-  menuButton: {
-    marginRight: theme.spacing(2),
+const useStyles = makeStyles(() => ({
+  header: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: "0 30px",
   },
   title: {
     marginRight: 30,
     textDecoration: "none",
     color: "#fff",
   },
+  toolBar: { flex: 1, display: "flex", justifyContent: "space-between" },
   tabs: { height: 54, marginTop: 10 },
 }));
 
 export const AppHeader: React.FC = () => {
   const classes = useStyles();
   const { pathname } = useLocation();
+  const { setModalOpen } = useContext(AddMovieModalContext);
 
   return (
-    <AppBar position="sticky">
-      <Toolbar>
-        <Typography component="h1">
-          <Typography
-            variant="h6"
-            component={Link}
-            to="/"
-            className={classes.title}
-          >
-            Movies Directory
-          </Typography>
+    <AppBar position="sticky" className={classes.header}>
+      <Typography component="h1">
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/"
+          className={classes.title}
+        >
+          Movies Directory
         </Typography>
+      </Typography>
 
+      <Toolbar className={classes.toolBar}>
         <Tabs variant="standard" value={pathname} className={classes.tabs}>
           <Tab
             component={Link}
@@ -47,6 +54,10 @@ export const AppHeader: React.FC = () => {
             value="/all-movies"
           />
         </Tabs>
+
+        <Button variant="contained" onClick={() => setModalOpen(true)}>
+          Add Movie
+        </Button>
       </Toolbar>
     </AppBar>
   );

@@ -1,10 +1,12 @@
+/* eslint-disable camelcase */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Movie } from "types/movie-types";
 import { RootState } from "types/store-types";
-import { fetchMovies } from "./get-movies-api";
+import { addNewMovie, fetchMovies } from "./movies-api";
 
 export interface MoviesState {
   collection: Movie[];
+  myMovies: Movie[];
   currentPage: number;
   totalPages: number;
   totalResults: number;
@@ -13,6 +15,7 @@ export interface MoviesState {
 
 const initialState: MoviesState = {
   collection: [],
+  myMovies: [],
   currentPage: 1,
   totalPages: 1,
   totalResults: 20,
@@ -23,6 +26,19 @@ export const getMoviesAsyncAction = createAsyncThunk(
   "movies/fetchMovies",
   async (page: number) => {
     const response = await fetchMovies(page);
+    return response;
+  }
+);
+
+export const addMovieAsyncAction = createAsyncThunk(
+  "movies/addMovie",
+  async (data: {
+    title: string;
+    overview: string;
+    release_date: string;
+    poster_path?: string;
+  }) => {
+    const response = await addNewMovie(data);
     return response;
   }
 );
@@ -48,11 +64,22 @@ export const moviesSlice = createSlice({
           totalResults: total_results,
           collection: [...state.collection, ...results],
         };
+      })
+      .addCase(addMovieAsyncAction.fulfilled, (state, action) => {
+        const { payload } = action;
+
+        return {
+          ...state,
+          myMovies: [...state.myMovies, payload],
+        };
       });
   },
 });
 
-export const selectMovies = (state: RootState): Movie[] =>
+export const selectAllMovies = (state: RootState): Movie[] =>
   state.movies.collection;
+
+export const selectMyMovies = (state: RootState): Movie[] =>
+  state.movies.myMovies;
 
 export default moviesSlice.reducer;

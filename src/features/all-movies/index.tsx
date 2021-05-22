@@ -1,10 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import {
-  Card,
-  CardActionArea,
-  CardContent,
-  CardMedia,
+  Button,
   CircularProgress,
   Grid,
   makeStyles,
@@ -13,13 +10,24 @@ import {
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { useAppSelector } from "helpers/hooks";
-import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
-import { getMoviesAsyncAction, selectMovies } from "./movies-slice";
+import { AddMovieModalContext } from "helpers/add-movie-modal-context";
+import { MovieListItem } from "./movie-list-item";
+import {
+  getMoviesAsyncAction,
+  selectAllMovies,
+  selectMyMovies,
+} from "./movies-slice";
 
 import "react-circular-progressbar/dist/styles.css";
 
 const useStyles = makeStyles({
   root: { flexGrow: 1 },
+  loadingWrapper: {
+    height: 500,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   sectionTitle: {
     marginBottom: 30,
     backgroundColor: "#34495e",
@@ -28,15 +36,16 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 30,
   },
-  card: { maxWidth: 220, height: "100%", margin: "0 auto" },
-  media: { height: 330, marginBottom: 12 },
 });
 
 export const AllMovies: React.FC = () => {
   const dispatch = useDispatch();
   const classes = useStyles();
-  const movieList = useAppSelector((state) => selectMovies(state));
+  const { setModalOpen } = useContext(AddMovieModalContext);
+  const movieList = useAppSelector((state) => selectAllMovies(state));
+  const myMoviesList = useAppSelector((state) => selectMyMovies(state));
   const totalPages = useAppSelector((state) => state.movies.totalPages);
   const currentPage = useAppSelector((state) => state.movies.currentPage);
   const isLoading = useAppSelector(
@@ -51,14 +60,7 @@ export const AllMovies: React.FC = () => {
 
   if (isLoading && !movieList.length) {
     return (
-      <div
-        style={{
-          height: 500,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <div className={classes.loadingWrapper}>
         <CircularProgress />
       </div>
     );
@@ -66,8 +68,33 @@ export const AllMovies: React.FC = () => {
 
   return (
     <div className={classes.root}>
+      <Typography variant="h4" component="h2" className={classes.sectionTitle}>
+        My Movies
+      </Typography>
+
+      {myMoviesList.length ? (
+        <Grid container spacing={4}>
+          {myMoviesList.map((movie) => (
+            <MovieListItem key={movie.id} movie={movie} />
+          ))}
+        </Grid>
+      ) : (
+        <Typography variant="body2" component="p" style={{ marginBottom: 20 }}>
+          You did not add movies yet, press
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setModalOpen(true)}
+            style={{ margin: "0 10px" }}
+          >
+            Add Movie
+          </Button>
+          to start adding your list.
+        </Typography>
+      )}
+
       <InfiniteScroll
-        dataLength={movieList.length} // This is important field to render the next data
+        dataLength={movieList.length}
         next={fetchMore}
         hasMore={currentPage < totalPages}
         loader={
@@ -92,66 +119,7 @@ export const AllMovies: React.FC = () => {
 
         <Grid container spacing={4}>
           {movieList.map((movie) => (
-            <Grid item xs={12} md={3} sm={4} key={movie.id}>
-              <Card
-                className={classes.card}
-                onClick={() =>
-                  window.open(`https://www.themoviedb.org/movie/${movie.id}`)
-                }
-              >
-                <CardActionArea>
-                  <CardMedia
-                    className={classes.media}
-                    image={`https://image.tmdb.org/t/p/w220_and_h330_face${movie.poster_path}`}
-                    title={movie.title}
-                  />
-
-                  <div
-                    style={{
-                      width: 45,
-                      height: 45,
-                      position: "absolute",
-                      top: 305,
-                      left: 10,
-                    }}
-                  >
-                    <CircularProgressbar
-                      value={movie.vote_average}
-                      maxValue={10}
-                      text={`${movie.vote_average}`}
-                      background
-                      backgroundPadding={5}
-                      styles={buildStyles({
-                        backgroundColor: "#081C22",
-                        textColor: "#fff",
-                        pathColor: "#1FBF70",
-                        trailColor: "transparent",
-                        textSize: 36,
-                      })}
-                    />
-                  </div>
-                  <CardContent>
-                    <Typography
-                      gutterBottom
-                      variant="subtitle2"
-                      component="h2"
-                      align="left"
-                    >
-                      {movie.title}
-                    </Typography>
-
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      component="p"
-                      align="left"
-                    >
-                      {movie.release_date}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
+            <MovieListItem key={movie.id} movie={movie} />
           ))}
         </Grid>
       </InfiniteScroll>
